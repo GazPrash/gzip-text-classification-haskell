@@ -1,7 +1,6 @@
 module Main where
 
 -- import System.IO
-
 import Classifier (argsort, clfModel, normalizedCompressionDistance, xtestCmp)
 import Compression (gziplinesN)
 
