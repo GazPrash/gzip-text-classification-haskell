@@ -1,4 +1,4 @@
-module Classifier (normalizedCompressionDistance, argsort, xtestCmp, clfModel) where
+module Classifier (normalizedCompressionDistance, argsort, xtestDist, clfModel) where
 
 import Compression (gzipline)
 import Data.List (group, maximumBy, sortOn)
@@ -15,16 +15,12 @@ normalizedCompressionDistance x y = (fromIntegral cxy - fromIntegral minCxCy) / 
     maxCxCy :: Int
     maxCxCy = min (gzipline x) (gzipline y)
 
--- Argsort function | I do not know how this one works
--- argsort :: (Fractional a, Ord a) => [a] -> [a]
--- argsort xs = map snd $ sort $ zip xs [0 ..]
-
 argsort :: (Fractional a, Ord a) => [a] -> [Int]
 argsort = map fst . sortOn snd . zip [0 ..]
 
-xtestCmp :: (Fractional a) => String -> [(String, Int)] -> [a]
-xtestCmp _ [] = []
-xtestCmp x ((y, ind) : ys) = normalizedCompressionDistance x y : xtestCmp x ys
+xtestDist :: (Fractional a) => String -> [(String, Int)] -> [a]
+xtestDist _ [] = []
+xtestDist x ((y, ind) : ys) = normalizedCompressionDistance x y : xtestDist x ys
 
 assignClasses :: [(String, Int)] -> [Int] -> [Int]
 assignClasses [] _ = []
@@ -44,23 +40,3 @@ clfModel trainingset x1Dist k = freqCounter topkClass
 
     topkClass :: [Int]
     topkClass = assignClasses trainingset topk
-
--- where
---   gziped_x :: Double
---   gziped_x = gzipline x
---
---   gziped_y :: Double
---   gziped_y = gzipline y
---
---   gziped_ys :: Double
---   gziped_ys = gzipline ys
-
--- spatialDist :: (Fractional a) => a -> [a] -> [a]
--- spatialDist _ [] = []
--- spatialDist x (y : ys) = argsort (abs (x - y) : spatialDist x ys)
---
--- -- Desired working : [0.24, 1.122, 0.212] --> [1, 0, 1] (Classes)
--- knnModel :: (Fractional a) => [a] -> Int -> [[a]]
--- knnModel [] _ = []
--- knnModel _ 0 = []
--- knnModel (x : xs) k = spatialDist x xs
